@@ -1,0 +1,27 @@
+{
+  "_name_or_path": "results/checkpoints/multiz100way/89/128/64/True/defined.phastCons.percentile-75_0.05_0.001/medium/0.1/42/30000/True/True/True",
+  "architectures": [
+    "GPNRoFormerForMaskedLM"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "aux_features_vocab_size": 5,
+  "embedding_size": 768,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "layer_norm_eps": 1e-12,
+  "max_position_embeddings": 1536,
+  "model_type": "GPNRoFormer",
+  "n_aux_features": 445,
+  "num_attention_heads": 12,
+  "num_hidden_layers": 12,
+  "pad_token_id": 0,
+  "rotary_value": false,
+  "torch_dtype": "float32",
+  "transformers_version": "4.29.2",
+  "type_vocab_size": 2,
+  "use_cache": true,
+  "vocab_size": 6
+}
