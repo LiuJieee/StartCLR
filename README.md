@@ -1,4 +1,4 @@
-# Prediction of human pathogenic start loss variants based on multi-channel features
+# Prediction of human pathogenic start loss variants based on self-supervised contrastive learning
 
 StartCLR is a novel prediction method that combines self-supervised contrastive learning pre-training with supervised fine-tuning specifically for identifying pathogenic start loss variants. It effectively utilizes information from a large amount of unlabeled data and a small amount of labeled data, integrates embedding features from different DNA language models to comprehensively characterize the variant context sequence, and thus achieves accurate prediction of pathogenic variants.
 ![Main Figure](./figs/StartCLR_flowchart.png)
