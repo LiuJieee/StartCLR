@@ -70,7 +70,7 @@ Rscript data_process.R
 ```
 In this section, the example output file titled 'sample_GPNMSA_input.csv' and 'sample_HyenaDNA_input.txt'.
 
-### Quantify the Ref-seq feature based on GPN-MSA
+### Quantify the embedding feature based on GPN-MSA
 ```bash
 conda activate GPN-MSA
 cd GPNMSA
@@ -78,7 +78,7 @@ python GPN-MSA_feature_prepare.py
 ```
 In this section, the example output file titled 'sample_GPN-MSA_feature.pth'.
 
-### Quantify the epigenetic feature based on DanQ
+### Quantify the embedding feature based on HyenaDNA
 ```bash
 conda activate hyena-dna
 cd HyenaDNA
