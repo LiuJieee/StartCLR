@@ -68,7 +68,7 @@ Please note that the length of the mutated sequences are 1001 base pairs(bp), wi
 cd StartCLR
 Rscript data_process.R
 ```
-In this section, the example output file titled 'sample_GPNMSA_input.csv' and 'sample_HyenaDNA_input.txt' is available for download at https://zenodo.org/records/13689721.
+In this section, the example output file titled 'sample_GPNMSA_input.csv' and 'sample_HyenaDNA_input.txt'.
 
 ### Quantify the Ref-seq feature based on GPN-MSA
 ```bash
@@ -76,7 +76,7 @@ conda activate GPN-MSA
 cd GPNMSA
 python GPN-MSA_feature_prepare.py
 ```
-In this section, the example output file titled 'sample_GPN-MSA_feature.pth' is available for download at https://zenodo.org/records/13689721.
+In this section, the example output file titled 'sample_GPN-MSA_feature.pth'.
 
 ### Quantify the epigenetic feature based on DanQ
 ```bash
@@ -85,7 +85,7 @@ cd HyenaDNA
 python HyenaDNA_feature_prepare.py
 ```
 
-In this section, the example output file titled 'sample_HyenaDNA_features.pth' is available for download at https://zenodo.org/records/13689721.
+In this section, the example output file titled 'sample_HyenaDNA_features.pth'.
 
 ### Pathogenicity prediction
 
