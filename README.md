@@ -13,7 +13,7 @@ We run the program on the Ubuntu 22.04.4 LTS system.
 ## Additional requirements for model construction
 
 ### GPN-MSA
-This module is used to quantify the Ref-seq feature about reference sequence.
+This module is used to quantify the embedding features of mutated sequence derived from GPN-MSA.
 
 To install dependencies, create a new conda environment:
 ```bash
@@ -30,23 +30,45 @@ wget https://huggingface.co/songlab/gpn-msa-sapiens/resolve/main/pytorch_model.b
 For more information about GPN-MSA, see https://doi.org/10.1101/2023.10.10.561776 and https://github.com/songlab-cal/gpn.
 
 ### HyenaDNA 
-This module is used to quantify the epigenetic feature about mutated sequence.
+This module is used to quantify the embedding features of mutated sequence derived from HyenaDNA.
 
 To install dependencies, create a new conda environment:
 ```bash
-conda env create -f HyenaDNA.yml
+cd HyenaDNA
+conda create -n hyena-dna python=3.8
+conda activate hyana-dna
+conda install pytorch==1.13.0 torchvision==0.14.0 torchaudio==0.13.0 pytorch-cuda=11.7 -c pytorch -c nvidia
+pip install -r requirements.txt
+
+# install Flash Attention
+cd HyenaDNA/flash-attention
+git clone --recurse-submodules https://github.com/Dao-AILab/flash-attention.git
+
+# loading the pre-trained model 
+cd HuggingFace/hyenadna-tiny-1k-seqlen
+wget https://huggingface.co/LongSafari/hyenadna-tiny-1k-seqlen/resolve/main/.gitattributes?download=true
+wget https://huggingface.co/LongSafari/hyenadna-tiny-1k-seqlen/resolve/main/README.md?download=true
+wget https://huggingface.co/LongSafari/hyenadna-tiny-1k-seqlen/resolve/main/config.json?download=true
+wget https://huggingface.co/LongSafari/hyenadna-tiny-1k-seqlen/resolve/main/weights.ckpt?download=true
 ```
-For more information about HyenaDNA, see https://doi.org/10.1093/nar/gkw226 and http://github.com/uci-cbcl/DanQ.
+For more information about HyenaDNA, see https://proceedings.neurips.cc/paper_files/paper/2023/hash/86ab6927ee4ae9bde4247793c46797c7-Abstract-Conference.html and https://github.com/HazyResearch/hyena-dna.
 
 ## Quick start
 
 ### Input format
-StartPred supports variants in CSV format as input. The input file should contain at least 7 columns in the header as follows. [Sample file](./data/test.csv)
+StartCLR supports variants in TXT format as input. The input file should contain at least 6 columns in the header as follows. [Sample file](./dataset/sample_file.txt)
 
-|  Chr  | Pos |  Ref  |  Alt  |  Label  |  Reference sequence  |  Mutated sequence  |  ...  |
-| ----- | --- | ----- | ----- | ------- | -------------------- | ------------------ | ----- |
+|  Chr  | Pos |  Ref  |  Alt  |  Label  |  Mutated sequence  |  ...  |
+| ----- | --- | ----- | ----- | ------- | ------------------ | ----- |
 
-Please note that the length of both the reference and mutated sequences are 1001 base pairs(bp), with the mutation site at the center, and the context sequences on each side are 500 bp.
+Please note that the length of the mutated sequences are 1001 base pairs(bp), with the mutation site at the center, and the context sequences on each side are 500 bp. There is no LABEL column in the unlabeled data used for pre-training.
+
+### Input file process
+```bash
+cd StartCLR
+Rscript data_process.R
+```
+In this section, the example output file titled 'sample_GPNMSA_input.csv' and 'sample_HyenaDNA_input.txt' is available for download at https://zenodo.org/records/13689721.
 
 ### Quantify the Ref-seq feature based on GPN-MSA
 ```bash
@@ -54,16 +76,16 @@ conda activate GPN-MSA
 cd GPNMSA
 python GPN-MSA_feature_prepare.py
 ```
-In this section, the example output file titled 'test_GPN-MSA_feature.pth' is available for download at https://zenodo.org/records/13689721.
+In this section, the example output file titled 'sample_GPN-MSA_feature.pth' is available for download at https://zenodo.org/records/13689721.
 
 ### Quantify the epigenetic feature based on DanQ
 ```bash
-conda activate HyenaDNA
+conda activate hyena-dna
 cd HyenaDNA
 python HyenaDNA_feature_prepare.py
 ```
 
-In this section, the example output file titled 'test_HyenaDNA_features.pth' is available for download at https://zenodo.org/records/13689721.
+In this section, the example output file titled 'sample_HyenaDNA_features.pth' is available for download at https://zenodo.org/records/13689721.
 
 ### Pathogenicity prediction
 
@@ -71,11 +93,11 @@ In this section, the example output file titled 'test_HyenaDNA_features.pth' is 
 ```bash
 conda activate StartCLR
 cd StartCLR
-python main_pretrain_aug.pypython main_pretrain_aug.py  --epochs 20  --batch_size 256  --lr 0.0001  --dropout 0.1
+python main_pretrain_aug.py  --epochs 20  --batch_size 256  --lr 0.0001  --dropout 0.1
 ```
 #### Encoder fine-tuning and classifier training
 ```bash
-python main_finetune_aug.py   --epochs 20   --learning_rate 0.5  --dropout 0.1  --pretrained ./pretrain/simCLR_checkpoint_0019.pth.tar
+python main_finetune_aug.py   --epochs 20   --learning_rate 0.5  --dropout 0.1  --pretrained ./pretrain/checkpoint_0019.pth.tar
 ```
 
 ### Output format
@@ -88,7 +110,7 @@ The scoring threshold for StartCLR is established at 0.5, whereby variants scori
 ```
 @misc{
       title={Prediction of human pathogenic start loss variants based on self-supervised contrastive learning}, 
-      author={Jie Liu and Chen Wei and Henghui Fan and Lihua Wang and Bin Ye and Junfeng Xia},
+      author={Jie Liu and Henghui Fan and Na Cheng and Yansen Su and Junfeng Xia},
       year={2025}
 }
 ```
