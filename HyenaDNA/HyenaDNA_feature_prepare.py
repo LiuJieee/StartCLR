@@ -17,7 +17,7 @@ device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 
 # 读取数据
-test_data = pd.read_table("./Human_start-lost_HyenaDNA_input.txt", header=None) ###
+test_data = pd.read_table("../dataset/sample_HyenaDNA_input.txt", header=None) ###
 
 # select model
 pretrained_model_name = 'hyenadna-tiny-1k-seqlen'  # use None if training from scratch
@@ -97,5 +97,5 @@ with torch.inference_mode(): #
 ## 2.直接保存为pytorch张量形式的.pth文件
 fea_tensor = torch.from_numpy(features_np)
 print(fea_tensor.shape)
-torch.save(fea_tensor, './Human_start-lost_1001bp_HyenaDNA_feature.pth')
+torch.save(fea_tensor, '../dataset/sample_HyenaDNA_feature.pth')
 
