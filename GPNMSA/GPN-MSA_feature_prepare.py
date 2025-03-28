@@ -16,7 +16,7 @@ model_path = './model'
 msa_path = './89.zarr.zip'
 
 # 读取数据
-test_data = pd.read_csv("../data/test.csv", header=0)
+test_data = pd.read_csv("../dataset/sample_GPNMSA_input.csv", header=0)
 
 # 加载MSA数据
 genome_msa = GenomeMSA(msa_path)
@@ -59,4 +59,4 @@ with torch.no_grad():  # 不需要计算梯度，节省内存和计算资源
 
 # 将NumPy数组转换为PyTorch张量并保存为.pth文件
 features_tensor = torch.from_numpy(features_np)
-torch.save(features_tensor, '../data/test_GPN-MSA_feature.pth')
+torch.save(features_tensor, '../dataset/sample_GPN-MSA_feature.pth')

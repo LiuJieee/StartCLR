@@ -633,7 +633,7 @@ def main():
             },
             is_best=False,
             save_dir=args.model_save_dir,
-            filename="simCLR_checkpoint_{:04d}.pth.tar".format(epoch)
+            filename="checkpoint_{:04d}.pth.tar".format(epoch)
         )
 
         # ´òÓ¡µ±Ç°ÑµÁ·×´Ì¬
