@@ -99,7 +99,7 @@ python main_pretrain_aug.py  --epochs 20  --batch_size 256  --lr 0.0001  --dropo
 ```bash
 python main_finetune_aug.py   --epochs 20   --learning_rate 0.5  --dropout 0.1  --pretrained ./pretrain/checkpoint_0019.pth.tar
 ```
-The training and test datasets of StartCLR are available in the file all_dataset.zip, which can be downloaded from https://zenodo.org/records/13689721.
+The training and test datasets of StartCLR are available in the file all_dataset.zip, which can be downloaded from https://zenodo.org/records/13689721. Additionally, the pre-trained encoder and fine-tuned model are also available for download at the same link.
 
 ### Output format
 The program directly displays the prediction results upon completion.
