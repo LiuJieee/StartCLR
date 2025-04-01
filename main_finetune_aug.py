@@ -706,7 +706,7 @@ def main():
                 },
                 is_best=False,
                 save_dir=args.model_save_dir,
-                filename=f"simCLR_finetune_{epoch:04d}.pth.tar"
+                filename=f"finetune_{epoch:04d}.pth.tar"
             )
 
 
