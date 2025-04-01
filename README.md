@@ -104,9 +104,8 @@ python main_finetune_aug.py   --epochs 20   --learning_rate 0.5  --dropout 0.1  
 
 ### Output format
 The program directly displays the prediction results upon completion.
-
-It provides a comprehensive overview of StartCLR's predictive performance on the dataset, encompassing various metrics such as recall, specificity (SPE), precision (PRE), F1-score (F1), Matthew's correlation coefficient (MCC), accuracy (ACC), the area under the receiver operating characteristic curve (AUC), and the area under the precision-recall curve (AUPR).
-The scoring threshold for StartCLR is established at 0.5, whereby variants scoring below 0.5 are designated as benign and those scoring above 0.5 are identified as pathogenic.
+* It provides a comprehensive overview of StartCLR's predictive performance on the dataset, encompassing various metrics such as recall, specificity (SPE), precision (PRE), F1-score (F1), Matthew's correlation coefficient (MCC), accuracy (ACC), the area under the receiver operating characteristic curve (AUC), and the area under the precision-recall curve (AUPR).
+* The scoring threshold for StartCLR is established at 0.5, whereby variants scoring below 0.5 are designated as benign and those scoring above 0.5 are identified as pathogenic.
 
 ## Cite us
 ```
