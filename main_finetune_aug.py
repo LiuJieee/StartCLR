@@ -22,7 +22,7 @@ from sklearn.metrics import confusion_matrix, precision_score, f1_score, matthew
 from sklearn.metrics import roc_auc_score, average_precision_score
 
 
-# ÏßĞÔ·ÖÀàÆ÷Êı¾İ¼¯Àà
+# çº¿æ€§åˆ†ç±»å™¨æ•°æ®é›†ç±»
 class LinearClassifierDataset(Dataset):
     def __init__(self, data, gpn_msa, hyena_dna, train=True):
         self.data = data
@@ -30,7 +30,7 @@ class LinearClassifierDataset(Dataset):
         self.hyena_dna = hyena_dna
         self.train = train
 
-        # ¼ÙÉèdataÖĞ°üº¬±êÇ©ÁĞ£¬ÃüÃûÎª'label'
+        # å‡è®¾dataä¸­åŒ…å«æ ‡ç­¾åˆ—ï¼Œå‘½åä¸º'label'
         self.labels = torch.tensor(data['Label'].values, dtype=torch.long)
 
     def __len__(self):
@@ -48,50 +48,50 @@ class Classifier(nn.Module):
     def __init__(self, input_length, output_dim):
         super(Classifier, self).__init__()
 
-        # ¶¨ÒåÓë fc5 ÏàËÆµÄÍøÂç½á¹¹
+        # å®šä¹‰ä¸ fc5 ç›¸ä¼¼çš„ç½‘ç»œç»“æ„
         self.fc5 = nn.Sequential(
-            nn.Linear(input_length, 256),  # ´ÓÊäÈëÎ¬¶Èµ½256
+            nn.Linear(input_length, 256),  # ä»è¾“å…¥ç»´åº¦åˆ°256
             nn.BatchNorm1d(256),
-            nn.Mish(),  # ¼¤»îº¯Êı Mish
-            nn.Linear(256, 64),  # ´Ó256µ½64
+            nn.Mish(),  # æ¿€æ´»å‡½æ•° Mish
+            nn.Linear(256, 64),  # ä»256åˆ°64
             nn.BatchNorm1d(64),
-            nn.Mish(),  # ¼¤»îº¯Êı Mish
-            nn.Linear(64, output_dim)  # ×îºóÒ»²ãÊä³öÎ¬¶ÈÎª output_dim
+            nn.Mish(),  # æ¿€æ´»å‡½æ•° Mish
+            nn.Linear(64, output_dim)  # æœ€åä¸€å±‚è¾“å‡ºç»´åº¦ä¸º output_dim
         )
 
-        # ¶Ôfc5ÖĞµÄÏßĞÔ²ã½øĞĞ×Ô¶¨ÒåµÄ³õÊ¼»¯
+        # å¯¹fc5ä¸­çš„çº¿æ€§å±‚è¿›è¡Œè‡ªå®šä¹‰çš„åˆå§‹åŒ–
         self._initialize_weights()
 
-        # ¿ÉÑ¡µÄÅú¹éÒ»»¯£¬Èç¹ûĞèÒªµÄ»°
-        self.bn = None  # Èç¹ûĞèÒªµÄ»°¿ÉÒÔ½«ËüÌæ»»Îªnn.BatchNorm1dµÈ
+        # å¯é€‰çš„æ‰¹å½’ä¸€åŒ–ï¼Œå¦‚æœéœ€è¦çš„è¯
+        self.bn = None  # å¦‚æœéœ€è¦çš„è¯å¯ä»¥å°†å®ƒæ›¿æ¢ä¸ºnn.BatchNorm1dç­‰
 
     def forward(self, x):
-        # Ö±½ÓÍ¨¹ıfc5ÍøÂç½øĞĞÇ°Ïò´«²¥
+        # ç›´æ¥é€šè¿‡fc5ç½‘ç»œè¿›è¡Œå‰å‘ä¼ æ’­
         x = self.fc5(x)
         return x
 
     def _initialize_weights(self):
-        # ¶Ôfc5ÖĞµÄÃ¿Ò»²ã½øĞĞ³õÊ¼»¯
+        # å¯¹fc5ä¸­çš„æ¯ä¸€å±‚è¿›è¡Œåˆå§‹åŒ–
         for m in self.fc5:
-            if isinstance(m, nn.Linear):  # Ö»¶ÔLinear²ã½øĞĞ³õÊ¼»¯
-                m.weight.data.normal_(mean=0.0, std=0.01)  # Ê¹ÓÃÕıÌ¬·Ö²¼³õÊ¼»¯È¨ÖØ
-                m.bias.data.zero_()  # ½«Æ«ÖÃ³õÊ¼»¯ÎªÁã
+            if isinstance(m, nn.Linear):  # åªå¯¹Linearå±‚è¿›è¡Œåˆå§‹åŒ–
+                m.weight.data.normal_(mean=0.0, std=0.01)  # ä½¿ç”¨æ­£æ€åˆ†å¸ƒåˆå§‹åŒ–æƒé‡
+                m.bias.data.zero_()  # å°†åç½®åˆå§‹åŒ–ä¸ºé›¶
 
 
 def select_random_samples(args, data, gpn_msa, hyena_dna, sample_ratio=0.1):
-    """Ëæ»úÑ¡ÔñÕıÑù±¾ºÍ¸ºÑù±¾"""
+    """éšæœºé€‰æ‹©æ­£æ ·æœ¬å’Œè´Ÿæ ·æœ¬"""
     positive_samples = data[data['Label'] == 1]
     negative_samples = data[data['Label'] == 0]
 
-    # ¼ÆËãĞèÒªÑ¡ÔñµÄÑù±¾ÊıÁ¿
+    # è®¡ç®—éœ€è¦é€‰æ‹©çš„æ ·æœ¬æ•°é‡
     num_positive = int(len(positive_samples) * sample_ratio)
     num_negative = int(len(negative_samples) * sample_ratio)
 
-    # Ëæ»úÑ¡ÔñÑù±¾
+    # éšæœºé€‰æ‹©æ ·æœ¬
     selected_positive = positive_samples.sample(n=num_positive, random_state=args.seed)
     selected_negative = negative_samples.sample(n=num_negative, random_state=args.seed)
 
-    # ºÏ²¢Ñ¡ÔñµÄÑù±¾
+    # åˆå¹¶é€‰æ‹©çš„æ ·æœ¬
     selected_data = pd.concat([selected_positive, selected_negative])
     selected_gpn_msa = gpn_msa[selected_data.index]
     selected_hyena_dna = hyena_dna[selected_data.index]
@@ -100,7 +100,7 @@ def select_random_samples(args, data, gpn_msa, hyena_dna, sample_ratio=0.1):
 
 
 class AverageMeter:
-    """¼ÆËã²¢´æ´¢Æ½¾ùÖµºÍµ±Ç°Öµ"""
+    """è®¡ç®—å¹¶å­˜å‚¨å¹³å‡å€¼å’Œå½“å‰å€¼"""
 
     def __init__(self, name, fmt=":f"):
         self.name = name
@@ -151,16 +151,16 @@ def adjust_learning_rate(optimizer, epoch, args):
 
 
 def accuracy(output, target, topk=(1,)):
-    """¼ò»¯µÄ¶ş·ÖÀà×¼È·ÂÊ¼ÆËã"""
+    """ç®€åŒ–çš„äºŒåˆ†ç±»å‡†ç¡®ç‡è®¡ç®—"""
     with torch.no_grad():
         pred = output.argmax(dim=1)
         correct = pred.eq(target)
         acc = correct.float().mean() * 100
-        return [acc, acc]  # ·µ»ØµÄ acc ÊÇÒ»¸ö±êÁ¿ÕÅÁ¿
+        return [acc, acc]  # è¿”å›çš„ acc æ˜¯ä¸€ä¸ªæ ‡é‡å¼ é‡
 
 
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
-    # Ìí¼ÓÊ±¼ä´Á
+    # æ·»åŠ æ—¶é—´æˆ³
     timestamp = time.strftime('%Y%m%d_%H%M%S')
     filename = f'checkpoint_{timestamp}.pth.tar'
 
@@ -193,7 +193,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, args):
             hyena = hyena.cuda(args.gpu, non_blocking=True)
             target = target.cuda(args.gpu, non_blocking=True)
         
-        #Çå¿ÕÌİ¶È
+        #æ¸…ç©ºæ¢¯åº¦
         optimizer.zero_grad()
         
         # compute output
@@ -203,12 +203,12 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, args):
 
         # compute gradient and do SGD step
         loss.backward()
-        optimizer.step() #ÓÅ»¯Æ÷¸üĞÂ
+        optimizer.step() #ä¼˜åŒ–å™¨æ›´æ–°
 
         # measure accuracy and record loss
         acc1, acc5 = accuracy(output, target, topk=(1, 5))
         losses.update(loss.item(), gpn.size(0))
-        top1.update(acc1.item(), gpn.size(0))  # Ê¹ÓÃ item() ·½·¨»ñÈ¡±êÁ¿Öµ
+        top1.update(acc1.item(), gpn.size(0))  # ä½¿ç”¨ item() æ–¹æ³•è·å–æ ‡é‡å€¼
 
         # measure elapsed time
         batch_time.update(time.time() - end)
@@ -221,13 +221,13 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, args):
 
 
 def save_checkpoint(state, is_best, save_dir="./finetune", filename="finetune.pth.tar"):
-    # Ìí¼Ó°æ±¾¿ØÖÆºÍ¶¨ÆÚÇåÀí
+    # æ·»åŠ ç‰ˆæœ¬æ§åˆ¶å’Œå®šæœŸæ¸…ç†
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
     filepath = os.path.join(save_dir, filename)
 
-    # Ìí¼Ó´íÎó´¦Àí
+    # æ·»åŠ é”™è¯¯å¤„ç†
     try:
         torch.save(state, filepath)
         if is_best:
@@ -239,7 +239,7 @@ def save_checkpoint(state, is_best, save_dir="./finetune", filename="finetune.pt
 
 
 def cross_validate(train_dataset, args):
-    # ´´½¨5ÕÛ½»²æÑéÖ¤µÄ·Ö¸îÆ÷
+    # åˆ›å»º5æŠ˜äº¤å‰éªŒè¯çš„åˆ†å‰²å™¨
     kf = KFold(n_splits=5, shuffle=True, random_state=args.seed)
     metrics_results = {
         'SEN': [], 'SPE': [], 'PRE': [], 'F1': [],
@@ -263,36 +263,36 @@ def cross_validate(train_dataset, args):
         model = model.cuda(args.gpu)
         classifier = classifier.cuda(args.gpu)
 
-        # ¼ÓÔØÔ¤ÑµÁ·Ä£ĞÍ
+        # åŠ è½½é¢„è®­ç»ƒæ¨¡å‹
         if args.pretrained:
             if os.path.isfile(args.pretrained):
                 print(f"=> loading checkpoint '{args.pretrained}'")
                 checkpoint = torch.load(args.pretrained, map_location="cpu")
 
-                # ÌáÈ¡Ô¤ÑµÁ·µÄ state_dict
+                # æå–é¢„è®­ç»ƒçš„ state_dict
                 state_dict = checkpoint['state_dict']
-                #print("State dict keys:", state_dict.keys())  # Êä³öËùÓĞ¼ü
+                #print("State dict keys:", state_dict.keys())  # è¾“å‡ºæ‰€æœ‰é”®
 
-                # ÖØĞÂÃüÃûºÍ¹ıÂË¼ü
+                # é‡æ–°å‘½åå’Œè¿‡æ»¤é”®
                 new_state_dict = {}
                 for k, v in state_dict.items():
                     if k.startswith("fea_encoder"):
-                        new_key = k[len("fea_encoder."):]  # ÒÆ³ı "fea_encoder." Ç°×º
+                        new_key = k[len("fea_encoder."):]  # ç§»é™¤ "fea_encoder." å‰ç¼€
                         new_state_dict[new_key] = v
 
-                # ¼ÓÔØµ½Ä£ĞÍÖĞ
+                # åŠ è½½åˆ°æ¨¡å‹ä¸­
                 msg = model.load_state_dict(new_state_dict, strict=False)
                 print(f"=> loaded pre-trained model '{args.pretrained}'")
             else:
                 print(f"=> no checkpoint found at '{args.pretrained}'")
 
-        # ¶¨ÒåËğÊ§º¯ÊıºÍÓÅ»¯Æ÷
+        # å®šä¹‰æŸå¤±å‡½æ•°å’Œä¼˜åŒ–å™¨
         criterion = nn.CrossEntropyLoss().cuda(args.gpu)
         optimizer = torch.optim.SGD(list(model.parameters()) + list(classifier.parameters()), args.learning_rate,
                                     weight_decay=args.weight_decay)
         cudnn.benchmark = True
 
-        # ´´½¨µ±Ç°ÕÛµÄÊı¾İ¼ÓÔØÆ÷
+        # åˆ›å»ºå½“å‰æŠ˜çš„æ•°æ®åŠ è½½å™¨
         train_subsampler = torch.utils.data.SubsetRandomSampler(train_idx)
         val_subsampler = torch.utils.data.SubsetRandomSampler(val_idx)
         
@@ -305,27 +305,27 @@ def cross_validate(train_dataset, args):
         
         best_metrics = None
         best_acc1 = 0
-        # ÑµÁ·µ±Ç°ÕÛ
+        # è®­ç»ƒå½“å‰æŠ˜
         for epoch in range(args.epochs):
             adjust_learning_rate(optimizer, epoch, args)
             
-            # ÑµÁ·Ò»¸öepoch
+            # è®­ç»ƒä¸€ä¸ªepoch
             _, _, acc1 = train(fold_train_loader, model, classifier, criterion, optimizer, epoch, args)
             
-            # ÔÚÑéÖ¤¼¯ÉÏÆÀ¹À
+            # åœ¨éªŒè¯é›†ä¸Šè¯„ä¼°
             acc, probs, preds, current_metrics = validate(fold_val_loader, model, classifier, criterion, args)
         
-        # ±£´æµ±Ç°ÕÛµÄ×î¼Ñ½á¹û
+        # ä¿å­˜å½“å‰æŠ˜çš„æœ€ä½³ç»“æœ
         print(f"\nFold {fold + 1} Results:")
         for metric, value in current_metrics.items():
             metrics_results[metric].append(value)
             print(f"{metric}: {value:.4f}")
 
-        #ÇåÀíÄÚ´æ
+        #æ¸…ç†å†…å­˜
         del model, classifier, optimizer
         torch.cuda.empty_cache()
         
-    # ¼ÆËã²¢´òÓ¡×îÖÕµÄÆ½¾ù½á¹û
+    # è®¡ç®—å¹¶æ‰“å°æœ€ç»ˆçš„å¹³å‡ç»“æœ
     print(f"\n{'='*20} Final five-fold cross validation results {'='*20}")
     for metric in metrics_results.keys():
         values = metrics_results[metric]
@@ -340,12 +340,12 @@ def validate(val_loader, model, classifier, criterion, args):
     batch_time = AverageMeter('Time', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
 
-    # ³õÊ¼»¯»ìÏı¾ØÕóµÄ×é¼ş
+    # åˆå§‹åŒ–æ··æ·†çŸ©é˜µçš„ç»„ä»¶
     all_targets = []
     all_preds = []
     all_probs = []
 
-    # ÇĞ»»µ½ÆÀ¹ÀÄ£Ê½
+    # åˆ‡æ¢åˆ°è¯„ä¼°æ¨¡å¼
     model.eval()
     classifier.eval()
 
@@ -357,39 +357,39 @@ def validate(val_loader, model, classifier, criterion, args):
                 hyena = hyena.cuda(args.gpu, non_blocking=True)
                 target = target.cuda(args.gpu, non_blocking=True)
 
-            # ¼ÆËãÊä³ö
+            # è®¡ç®—è¾“å‡º
             fea = model(gpn, hyena)
             output = classifier(fea)
 
-            # »ñÈ¡Ô¤²â¸ÅÂÊºÍ±êÇ©
+            # è·å–é¢„æµ‹æ¦‚ç‡å’Œæ ‡ç­¾
             probs = torch.softmax(output, dim=1)[:, 1]
             preds = (probs > 0.5).long()
 
-            # ¼ì²é NaN Öµ²¢´¦Àí
+            # æ£€æŸ¥ NaN å€¼å¹¶å¤„ç†
             if torch.isnan(probs).any() or torch.isnan(preds).any():
                 print(f"Warning: NaN values found in batch {i}")
                 continue
 
-            # ÊÕ¼¯ËùÓĞÔ¤²âºÍÄ¿±ê
+            # æ”¶é›†æ‰€æœ‰é¢„æµ‹å’Œç›®æ ‡
             all_targets.extend(target.cpu().numpy())
             all_preds.extend(preds.cpu().numpy())
             all_probs.extend(probs.cpu().numpy())
 
-            # ²âÁ¿Ê±¼ä
+            # æµ‹é‡æ—¶é—´
             batch_time.update(time.time() - end)
             end = time.time()
 
-    # ×ª»»ÎªnumpyÊı×é
-    all_targets = np.array(all_targets)  # ÕæÊµ±êÇ©
-    all_preds = np.array(all_preds)  # Ô¤²â±êÇ©
-    all_probs = np.array(all_probs)  # Ô¤²â¸ÅÂÊ
+    # è½¬æ¢ä¸ºnumpyæ•°ç»„
+    all_targets = np.array(all_targets)  # çœŸå®æ ‡ç­¾
+    all_preds = np.array(all_preds)  # é¢„æµ‹æ ‡ç­¾
+    all_probs = np.array(all_probs)  # é¢„æµ‹æ¦‚ç‡
 
-    # Ìí¼Ó¼ì²éÒÔÈ·±£ÓĞÓĞĞ§µÄÔ¤²âºÍÄ¿±ê
+    # æ·»åŠ æ£€æŸ¥ä»¥ç¡®ä¿æœ‰æœ‰æ•ˆçš„é¢„æµ‹å’Œç›®æ ‡
     if len(all_targets) == 0 or len(all_preds) == 0:
         print("Error: No valid predictions")
         return 0, [], [], {}
 
-    # ¼ÆËã¸÷ÏîÖ¸±ê
+    # è®¡ç®—å„é¡¹æŒ‡æ ‡
     tn, fp, fn, tp = confusion_matrix(all_targets, all_preds).ravel()
 
     metrics = {
@@ -403,7 +403,7 @@ def validate(val_loader, model, classifier, criterion, args):
         'AUPR': average_precision_score(all_targets, all_probs)
     }
 
-    # ´òÓ¡µ±Ç°ÆÀ¹ÀÖ¸±ê
+    # æ‰“å°å½“å‰è¯„ä¼°æŒ‡æ ‡
     for metric, value in metrics.items():
         print(f' * {metric}: {value:.4f}')
 
@@ -411,7 +411,7 @@ def validate(val_loader, model, classifier, criterion, args):
 
 
 def predict(val_loader, model, classifier, criterion, args):
-    # ÇĞ»»µ½ÆÀ¹ÀÄ£Ê½
+    # åˆ‡æ¢åˆ°è¯„ä¼°æ¨¡å¼
     model.eval()
     classifier.eval()
     all_preds = []
@@ -424,28 +424,28 @@ def predict(val_loader, model, classifier, criterion, args):
                 gpn = gpn.cuda(args.gpu, non_blocking=True)
                 hyena = hyena.cuda(args.gpu, non_blocking=True)
 
-            # ¼ÆËãÊä³ö
+            # è®¡ç®—è¾“å‡º
             fea = model(gpn, hyena)
             output = classifier(fea)
 
-            # »ñÈ¡Ô¤²â¸ÅÂÊºÍ±êÇ©
+            # è·å–é¢„æµ‹æ¦‚ç‡å’Œæ ‡ç­¾
             probs = torch.softmax(output, dim=1)[:, 1]
             preds = (probs > 0.5).long()
 
-            # ¼ì²é NaN Öµ²¢´¦Àí
+            # æ£€æŸ¥ NaN å€¼å¹¶å¤„ç†
             if torch.isnan(probs).any() or torch.isnan(preds).any():
                 print(f"Warning: NaN values found in probabilities or predictions at batch {i}.")
-                continue  # Ìø¹ıµ±Ç°Åú´Î
+                continue  # è·³è¿‡å½“å‰æ‰¹æ¬¡
 
-            # ÊÕ¼¯ËùÓĞÔ¤²âºÍÄ¿±ê
+            # æ”¶é›†æ‰€æœ‰é¢„æµ‹å’Œç›®æ ‡
             all_preds.extend(preds.cpu().numpy())
             all_probs.extend(probs.cpu().numpy())
 
-    # ×ª»»ÎªnumpyÊı×é
-    all_preds = np.array(all_preds)  # Ô¤²â±êÇ©
-    all_probs = np.array(all_probs)  # Ô¤²â¸ÅÂÊ
+    # è½¬æ¢ä¸ºnumpyæ•°ç»„
+    all_preds = np.array(all_preds)  # é¢„æµ‹æ ‡ç­¾
+    all_probs = np.array(all_probs)  # é¢„æµ‹æ¦‚ç‡
 
-    return all_probs, all_preds  # ÈÔÈ»·µ»Ø×¼È·ÂÊ×÷ÎªÖ÷ÒªÖ¸±ê
+    return all_probs, all_preds  # ä»ç„¶è¿”å›å‡†ç¡®ç‡ä½œä¸ºä¸»è¦æŒ‡æ ‡
 
 
 def main():
@@ -486,66 +486,66 @@ def main():
         warnings.warn('You have chosen a specific GPU.')
         torch.cuda.set_device(args.gpu)
 
-    # ¼ÓÔØÊı¾İ
+    # åŠ è½½æ•°æ®
     try:
-        # ¼ÓÔØÑµÁ·¼¯
+        # åŠ è½½è®­ç»ƒé›†
         if args.high_confi:
             print("\n=> Starting training with 990 samples")
             train_data = pd.read_csv(os.path.join(args.data, "Training_990pos_990neg_start-lost_hg38_1001bp_seq.txt"), sep="\t", header=0)
-            print("ÑµÁ·±êÇ©¼ÓÔØ³É¹¦£¬Êı¾İĞÎ×´:", train_data.shape)
+            print("è®­ç»ƒæ ‡ç­¾åŠ è½½æˆåŠŸï¼Œæ•°æ®å½¢çŠ¶:", train_data.shape)
             train_gpn_msa = torch.load(os.path.join(args.data, "Training_990pos_990neg_start-lost_hg38_GPN-MSA_alt_feature.pth"))
-            print("ÑµÁ·GPN-MSAÌØÕ÷¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", train_gpn_msa.shape)
+            print("è®­ç»ƒGPN-MSAç‰¹å¾åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", train_gpn_msa.shape)
             train_hyena_dna = torch.load(os.path.join(args.data, "Training_990pos_990neg_start-lost_hg38_1001bp_HyenaDNA_feature.pth"))
-            print("ÑµÁ·HyenaDNAÌØÕ÷¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", train_hyena_dna.shape)
+            print("è®­ç»ƒHyenaDNAç‰¹å¾åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", train_hyena_dna.shape)
         
         else:
             print("\n=> Starting training with 1264 samples")
             train_data = pd.read_csv(os.path.join(args.data, "1-Training_Label_1264pos_1264neg_start-lost_hg38_1001bp_kmer_random.csv"), sep=",", header=0)
-            print("ÑµÁ·±êÇ©¼ÓÔØ³É¹¦£¬Êı¾İĞÎ×´:", train_data.shape)
+            print("è®­ç»ƒæ ‡ç­¾åŠ è½½æˆåŠŸï¼Œæ•°æ®å½¢çŠ¶:", train_data.shape)
             train_gpn_msa = torch.load(os.path.join(args.data, "1-Training_Label_1264pos_1264neg_start-lost_hg38_GPN-MSA_alt_feature.pth"))
-            print("ÑµÁ·GPN-MSAÌØÕ÷¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", train_gpn_msa.shape)
+            print("è®­ç»ƒGPN-MSAç‰¹å¾åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", train_gpn_msa.shape)
             train_hyena_dna = torch.load(os.path.join(args.data, "1-Training_Label_1264pos_1264neg_start-lost_hg38_1001bp_HyenaDNA_feature.pth"))
-            print("ÑµÁ·HyenaDNAÌØÕ÷¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", train_hyena_dna.shape)
+            print("è®­ç»ƒHyenaDNAç‰¹å¾åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", train_hyena_dna.shape)
 
-        # ¼ÓÔØ²âÊÔ¼¯Ò»
+        # åŠ è½½æµ‹è¯•é›†ä¸€
         val_data = pd.read_csv(os.path.join(args.data, "Testing_Label_700pos_486neg_start-lost_hg38_1001bp_kmer_random.txt"), sep="\t", header=0)
-        print("²âÊÔ¼¯Ò»±êÇ©¼ÓÔØ³É¹¦£¬Êı¾İĞÎ×´:", val_data.shape)
+        print("æµ‹è¯•é›†ä¸€æ ‡ç­¾åŠ è½½æˆåŠŸï¼Œæ•°æ®å½¢çŠ¶:", val_data.shape)
         val_gpn_msa = torch.load(os.path.join(args.data, "Testing_Label_700pos_486neg_start-lost_hg38_GPN-MSA_alt_feature.pth"))
-        print("²âÊÔ¼¯Ò»GPN-MSAÌØÕ÷¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", val_gpn_msa.shape)
+        print("æµ‹è¯•é›†ä¸€GPN-MSAç‰¹å¾åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", val_gpn_msa.shape)
         val_hyena_dna = torch.load(os.path.join(args.data, "Testing_Label_700pos_486neg_start-lost_hg38_1001bp_random_HyenaDNA_feature.pth"))
-        print("²âÊÔ¼¯Ò»HyenaDNAÌØÕ÷¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", val_hyena_dna.shape)
+        print("æµ‹è¯•é›†ä¸€HyenaDNAç‰¹å¾åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", val_hyena_dna.shape)
 
-        # ¼ÓÔØ²âÊÔ¼¯¶ş
+        # åŠ è½½æµ‹è¯•é›†äºŒ
         test_data = pd.read_csv(os.path.join(args.data, "HGMD-ClinVar_new_startloss_1001bp_seq.txt"), sep="\t", header=0)
-        print("²âÊÔ¼¯¶ş±êÇ©¼ÓÔØ³É¹¦£¬Êı¾İĞÎ×´:", test_data.shape)
+        print("æµ‹è¯•é›†äºŒæ ‡ç­¾åŠ è½½æˆåŠŸï¼Œæ•°æ®å½¢çŠ¶:", test_data.shape)
         test_gpn_msa = torch.load(os.path.join(args.data, "HGMD-ClinVar_new_startloss_GPN-MSA_alt_feature.pth"))
-        print("²âÊÔ¼¯¶şGPN-MSAÌØÕ÷Êı¾İ¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", test_gpn_msa.shape)
+        print("æµ‹è¯•é›†äºŒGPN-MSAç‰¹å¾æ•°æ®åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", test_gpn_msa.shape)
         test_hyena_dna = torch.load(os.path.join(args.data, "HGMD-ClinVar_new_startloss_1001bp_HyenaDNA_feature.pth"))
-        print("²âÊÔ¼¯¶şHyenaDNAÌØÕ÷Êı¾İ¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", test_hyena_dna.shape)
+        print("æµ‹è¯•é›†äºŒHyenaDNAç‰¹å¾æ•°æ®åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", test_hyena_dna.shape)
 
-        # ¼ÓÔØ²âÊÔ×Ó¼¯
-        notrain_data = pd.read_csv(os.path.join(args.data, "Testing1_subset_NoTrain_830data_1001bp_seq.txt"), sep="\t", header=0)
-        print("Î´ÑµÁ·×Ó¼¯±êÇ©¼ÓÔØ³É¹¦£¬Êı¾İĞÎ×´:", notrain_data.shape)
-        notrain_gpn_msa = torch.load(os.path.join(args.data, "Testing1_subset_NoTrain_830data_GPN-MSA_alt_feature.pth"))
-        print("Î´ÑµÁ·×Ó¼¯GPN-MSAÌØÕ÷Êı¾İ¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", notrain_gpn_msa.shape)
-        notrain_hyena_dna = torch.load(os.path.join(args.data, "Testing1_subset_NoTrain_830data_1001bp_HyenaDNA_feature.pth"))
-        print("Î´ÑµÁ·×Ó¼¯HyenaDNAÌØÕ÷Êı¾İ¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", notrain_hyena_dna.shape)
+#        # åŠ è½½æµ‹è¯•å­é›†
+#        notrain_data = pd.read_csv(os.path.join(args.data, "Testing1_subset_NoTrain_830data_1001bp_seq.txt"), sep="\t", header=0)
+#        print("æœªè®­ç»ƒå­é›†æ ‡ç­¾åŠ è½½æˆåŠŸï¼Œæ•°æ®å½¢çŠ¶:", notrain_data.shape)
+#        notrain_gpn_msa = torch.load(os.path.join(args.data, "Testing1_subset_NoTrain_830data_GPN-MSA_alt_feature.pth"))
+#        print("æœªè®­ç»ƒå­é›†GPN-MSAç‰¹å¾æ•°æ®åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", notrain_gpn_msa.shape)
+#        notrain_hyena_dna = torch.load(os.path.join(args.data, "Testing1_subset_NoTrain_830data_1001bp_HyenaDNA_feature.pth"))
+#        print("æœªè®­ç»ƒå­é›†HyenaDNAç‰¹å¾æ•°æ®åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", notrain_hyena_dna.shape)
 
-#        # Ëæ»úÑ¡Ôñ²¿·ÖÕıÑù±¾ºÍ¸ºÑù±¾½øĞĞÄ£ĞÍÎ¢µ÷
+#        # éšæœºé€‰æ‹©éƒ¨åˆ†æ­£æ ·æœ¬å’Œè´Ÿæ ·æœ¬è¿›è¡Œæ¨¡å‹å¾®è°ƒ
 #        train_data, train_gpn_msa, train_hyena_dna = select_random_samples(args, train_data, train_gpn_msa, train_hyena_dna, sample_ratio=0.1)
-#        print("Ëæ»úÑ¡ÔñµÄÑµÁ·Êı¾İĞÎ×´:", train_data.shape)
+#        print("éšæœºé€‰æ‹©çš„è®­ç»ƒæ•°æ®å½¢çŠ¶:", train_data.shape)
 
-#        # ¼ÓÔØÊı¾İ¼¯
+#        # åŠ è½½æ•°æ®é›†
 #        pre_data = pd.read_csv(os.path.join(args.data, "Human_start-lost_list_180350_hg38_1001bp_seq.txt"), sep="\t", header=0)
 #        if 'Label' not in pre_data.columns:
-#            pre_data['Label'] = -1  # Ìí¼Ó 'Label' ÁĞ²¢ÉèÖÃÖµÎª -1
-#        print("Êı¾İ¼¯±êÇ©¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", pre_data.shape)
+#            pre_data['Label'] = -1  # æ·»åŠ  'Label' åˆ—å¹¶è®¾ç½®å€¼ä¸º -1
+#        print("æ•°æ®é›†æ ‡ç­¾åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", pre_data.shape)
 #        pre_gpn_msa = torch.load(os.path.join(args.data, "Human_start-lost_180350data_GPN-MSA_alt_feature.pth"))
-#        print("Êı¾İ¼¯GPN-MSAÌØÕ÷Êı¾İ¼ÓÔØ³É¹¦, Êı¾İĞÎ×´:", pre_gpn_msa.shape)
+#        print("æ•°æ®é›†GPN-MSAç‰¹å¾æ•°æ®åŠ è½½æˆåŠŸ, æ•°æ®å½¢çŠ¶:", pre_gpn_msa.shape)
 #        pre_hyena_dna = torch.load(os.path.join(args.data, "Human_start-lost_180350data_1001bp_HyenaDNA_feature.pth"))
-#        print("Êı¾İ¼¯HyenaDNAÌØÕ÷Êı¾İ¼ÓÔØ³É¹¦,Êı¾İĞÎ×´:", pre_hyena_dna.shape)
+#        print("æ•°æ®é›†HyenaDNAç‰¹å¾æ•°æ®åŠ è½½æˆåŠŸ,æ•°æ®å½¢çŠ¶:", pre_hyena_dna.shape)
 
-        # ´´½¨Êı¾İ¼¯
+        # åˆ›å»ºæ•°æ®é›†
         train_dataset = LinearClassifierDataset(
             train_data,
             train_gpn_msa,
@@ -567,12 +567,12 @@ def main():
             train=False
         )
 
-        notrain_dataset = LinearClassifierDataset(
-            notrain_data,
-            notrain_gpn_msa,
-            notrain_hyena_dna,
-            train=False
-        )
+#        notrain_dataset = LinearClassifierDataset(
+#            notrain_data,
+#            notrain_gpn_msa,
+#            notrain_hyena_dna,
+#            train=False
+#        )
 
 #        pre_dataset = LinearClassifierDataset(
 #            pre_data,
@@ -585,7 +585,7 @@ def main():
         print(f"Error loading data: {e}")
         return
 
-    # ´´½¨Êı¾İ¼ÓÔØÆ÷
+    # åˆ›å»ºæ•°æ®åŠ è½½å™¨
     train_loader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
@@ -610,13 +610,13 @@ def main():
         pin_memory=True
     )
 
-    notrain_loader = DataLoader(
-        notrain_dataset,
-        batch_size=args.batch_size,
-        shuffle=False,
-        num_workers=args.workers,
-        pin_memory=True
-    )
+#    notrain_loader = DataLoader(
+#        notrain_dataset,
+#        batch_size=args.batch_size,
+#        shuffle=False,
+#        num_workers=args.workers,
+#        pin_memory=True
+#    )
 
 #    pre_loader = DataLoader(
 #        pre_dataset,
@@ -626,15 +626,15 @@ def main():
 #        pin_memory=True
 #    )
 
-    # ½øĞĞ½»²æÑéÖ¤
+    # è¿›è¡Œäº¤å‰éªŒè¯
     if args.cross_validation:
         print("\n=> Starting five-fold cross validation")
-        # ½øĞĞ5ÕÛ½»²æÑéÖ¤
+        # è¿›è¡Œ5æŠ˜äº¤å‰éªŒè¯
         metrics_results = cross_validate(train_dataset, args)
 
     else:
         print("\n=> Starting training with whole training set")
-        # ´´½¨Ä£ĞÍ
+        # åˆ›å»ºæ¨¡å‹
         model = StartUp(
             gpn_embedding_dim=args.gpn_dim,
             hyena_embedding_dim=args.hyena_dim,
@@ -649,52 +649,52 @@ def main():
         model = model.cuda(args.gpu)
         classifier = classifier.cuda(args.gpu)
 
-        # ¼ÓÔØÔ¤ÑµÁ·Ä£ĞÍ
+        # åŠ è½½é¢„è®­ç»ƒæ¨¡å‹
         if args.pretrained:
             if os.path.isfile(args.pretrained):
                 print(f"=> loading checkpoint '{args.pretrained}'")
                 checkpoint = torch.load(args.pretrained, map_location="cpu")
 
-                # ÌáÈ¡Ô¤ÑµÁ·µÄ state_dict
+                # æå–é¢„è®­ç»ƒçš„ state_dict
                 state_dict = checkpoint['state_dict']
-                print("State dict keys:", state_dict.keys())  # Êä³öËùÓĞ¼ü
+                print("State dict keys:", state_dict.keys())  # è¾“å‡ºæ‰€æœ‰é”®
 
-                # ÖØĞÂÃüÃûºÍ¹ıÂË¼ü
+                # é‡æ–°å‘½åå’Œè¿‡æ»¤é”®
                 new_state_dict = {}
                 for k, v in state_dict.items():
                     if k.startswith("fea_encoder"):
-                        new_key = k[len("fea_encoder."):]  # ÒÆ³ı "fea_encoder." Ç°×º
+                        new_key = k[len("fea_encoder."):]  # ç§»é™¤ "fea_encoder." å‰ç¼€
                         new_state_dict[new_key] = v
 
-                # ¼ÓÔØµ½Ä£ĞÍÖĞ
+                # åŠ è½½åˆ°æ¨¡å‹ä¸­
                 msg = model.load_state_dict(new_state_dict, strict=False)
                 print(f"=> loaded pre-trained model '{args.pretrained}'")
             else:
                 print(f"=> no checkpoint found at '{args.pretrained}'")
 
-        # ¶¨ÒåËğÊ§º¯ÊıºÍÓÅ»¯Æ÷
+        # å®šä¹‰æŸå¤±å‡½æ•°å’Œä¼˜åŒ–å™¨
         criterion = nn.CrossEntropyLoss().cuda(args.gpu)
         optimizer = torch.optim.SGD(list(model.parameters()) + list(classifier.parameters()), args.learning_rate,
                                     weight_decay=args.weight_decay)
         cudnn.benchmark = True
 
-        # ¿ÉÑ¡£º´Ó¼ì²éµã»Ö¸´
+        # å¯é€‰ï¼šä»æ£€æŸ¥ç‚¹æ¢å¤
         best_acc1 = 0
         to_restore = {"epoch": 0}
         start_epoch = to_restore["epoch"]
 
-        # ÑµÁ·Ñ­»·
+        # è®­ç»ƒå¾ªç¯
         for epoch in range(start_epoch, args.epochs):
             adjust_learning_rate(optimizer, epoch, args)
 
-            # ÑµÁ·Ò»¸öepoch
+            # è®­ç»ƒä¸€ä¸ªepoch
             _, _, acc1 = train(train_loader, model, classifier, criterion, optimizer, epoch, args)
 
-            # ÔÚ²âÊÔ¼¯Ò»ÉÏÆÀ¹À
-            print("\nÔÚ²âÊÔ¼¯Ò»ÉÏÆÀ¹À:")
+            # åœ¨æµ‹è¯•é›†ä¸€ä¸Šè¯„ä¼°
+            print("\nåœ¨æµ‹è¯•é›†ä¸€ä¸Šè¯„ä¼°:")
             validate(val_loader, model, classifier, criterion, args)
 
-            # ¼ÇÂ¼×î¼Ñacc²¢±£´æ¼ì²éµã
+            # è®°å½•æœ€ä½³accå¹¶ä¿å­˜æ£€æŸ¥ç‚¹
             is_best = acc1 > best_acc1
             best_acc1 = max(acc1, best_acc1)
             
@@ -710,28 +710,28 @@ def main():
             )
 
 
-        # ÔÚ²âÊÔ¼¯Ò»ÉÏ½øĞĞ×îÖÕÆÀ¹À
-        # print("\nÔÚ²âÊÔ¼¯Ò»ÉÏÆÀ¹À:")
+        # åœ¨æµ‹è¯•é›†ä¸€ä¸Šè¿›è¡Œæœ€ç»ˆè¯„ä¼°
+        # print("\nåœ¨æµ‹è¯•é›†ä¸€ä¸Šè¯„ä¼°:")
         # validate(val_loader, model, classifier, criterion, args)
 
-        # ÔÚ²âÊÔ¼¯¶şÉÏ½øĞĞ×îÖÕÆÀ¹À
-        print("\nÔÚ²âÊÔ¼¯¶şÉÏÆÀ¹À:")
+        # åœ¨æµ‹è¯•é›†äºŒä¸Šè¿›è¡Œæœ€ç»ˆè¯„ä¼°
+        print("\nåœ¨æµ‹è¯•é›†äºŒä¸Šè¯„ä¼°:")
         validate(test_loader, model, classifier, criterion, args)
 
-        # ÔÚÎ´ÑµÁ·×Ó¼¯ÉÏ½øĞĞ×îÖÕÆÀ¹À
-        print("\nÔÚÎ´ÑµÁ·×Ó¼¯ÉÏÆÀ¹À:")
-        validate(notrain_loader, model, classifier, criterion, args)
+#        # åœ¨æœªè®­ç»ƒå­é›†ä¸Šè¿›è¡Œæœ€ç»ˆè¯„ä¼°
+#        print("\nåœ¨æœªè®­ç»ƒå­é›†ä¸Šè¯„ä¼°:")
+#        validate(notrain_loader, model, classifier, criterion, args)
 
 
-#        # ÔÚÊı¾İ¼¯ÉÏ½øĞĞÔ¤²â²¢Êä³ö
-#        print("\nÊä³öÔ¤²â½á¹û:")
+#        # åœ¨æ•°æ®é›†ä¸Šè¿›è¡Œé¢„æµ‹å¹¶è¾“å‡º
+#        print("\nè¾“å‡ºé¢„æµ‹ç»“æœ:")
 #        pred_score, pred_label = predict(pre_loader, model, classifier, criterion, args)
-#        pred_score_df = pd.DataFrame(pred_score, columns=['pred_score'])  # ½«Ô¤²â·ÖÊı×ª»»Îª DataFrame
-#        pred_label_df = pd.DataFrame(pred_label, columns=['pred_label'])  # ½«Ô¤²â±êÇ©×ª»»Îª DataFrame
+#        pred_score_df = pd.DataFrame(pred_score, columns=['pred_score'])  # å°†é¢„æµ‹åˆ†æ•°è½¬æ¢ä¸º DataFrame
+#        pred_label_df = pd.DataFrame(pred_label, columns=['pred_label'])  # å°†é¢„æµ‹æ ‡ç­¾è½¬æ¢ä¸º DataFrame
 #        merged_data = pd.concat([pre_data.iloc[:, :8], pred_score_df, pred_label_df], axis=1)
 #        output_path = "./Human_start-lost_180350data_startCLR_pred_result.txt"
 #        merged_data.to_csv(output_path, sep="\t", index=False)
-#        print(f"Êı¾İ¼¯Ô¤²â½á¹ûÒÑ±£´æÖÁ: {output_path}")
+#        print(f"æ•°æ®é›†é¢„æµ‹ç»“æœå·²ä¿å­˜è‡³: {output_path}")
 
 if __name__ == '__main__':
     main()
